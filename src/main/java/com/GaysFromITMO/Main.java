@@ -1,5 +1,6 @@
 package com.GaysFromITMO;
 
+import com.GaysFromITMO.core.Renderer;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -97,7 +98,8 @@ public class Main {
         GL.createCapabilities();
 
         // Set the clear color
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        Renderer.prepare();
+
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
