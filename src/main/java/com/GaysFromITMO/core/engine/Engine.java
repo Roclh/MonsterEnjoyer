@@ -1,5 +1,7 @@
 package com.GaysFromITMO.core.engine;
 
+import com.GaysFromITMO.Main;
+import com.GaysFromITMO.core.InterfaceLogic;
 import com.GaysFromITMO.core.window.WindowManager;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -15,11 +17,14 @@ public class Engine {
 
     private WindowManager window;
     private GLFWErrorCallback errorCallback;
+    private InterfaceLogic gameLogic;
 
     private void init() throws Exception{
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        window = new WindowManager("Monster Enjoyer", 1600, 900, false);
+        window = Main.getWindow();
+        gameLogic = Main.getGame();
         window.init();
+        gameLogic.init();
     }
 
     public void start() throws Exception{
@@ -45,7 +50,7 @@ public class Engine {
             unprocessedTime += passedTime / (double) NANOSECOND;
             frameCounter += passedTime;
 
-            //input
+            input();
 
             while(unprocessedTime > frametime){
                 render = true;
@@ -78,20 +83,22 @@ public class Engine {
     }
 
     private void input(){
-
+        gameLogic.input();
     }
 
     private void render(){
-
+        gameLogic.render();
+        window.update();
     }
 
     private void update(){
-        window.update();
+        gameLogic.update();
 
     }
 
     private void cleanup(){
         window.cleanup();
+        gameLogic.cleanup();
         errorCallback.free();
         GLFW.glfwTerminate();
     }
