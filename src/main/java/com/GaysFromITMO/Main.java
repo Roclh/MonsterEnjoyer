@@ -1,12 +1,21 @@
 package com.GaysFromITMO;
 
 import com.GaysFromITMO.core.Renderer;
+import com.GaysFromITMO.core.exceptions.WrongFigureVertexArrayException;
+import com.GaysFromITMO.core.figures.Square;
+import com.GaysFromITMO.core.figures.Triangle;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -51,7 +60,7 @@ public class Main {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
         // Create the window
-        window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(700, 700, "Monster Enjoyer", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -106,8 +115,14 @@ public class Main {
         while ( !glfwWindowShouldClose(window) ) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
+            Triangle triangle = new Triangle();
+            try{
+                triangle.setVertexArrayObject(triangle.applyToAxes((val)->val*10f));
+            }catch (WrongFigureVertexArrayException e){
+                System.out.println(e.getMessage());
+            }
+            Renderer.renderVertexArray(triangle);
             glfwSwapBuffers(window); // swap the color buffers
-
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents();

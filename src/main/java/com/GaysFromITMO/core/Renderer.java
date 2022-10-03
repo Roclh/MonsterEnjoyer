@@ -1,29 +1,36 @@
 package com.GaysFromITMO.core;
 
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL30;
+import com.GaysFromITMO.core.figures.FigureVertexArrayObject;
+import static org.lwjgl.opengl.GL46C.*;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 
 public class Renderer {
     public static void prepare(){
-        GL13.glClear(GL13.GL_COLOR_BUFFER_BIT);
-        GL13.glClearColor(0.5f, 0.75f, 1.0f, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.5f, 0.75f, 1.0f, 1);
     }
 
-    public static void renderVertexArray(float[] data){
-        int vaoId = GL30.glGenVertexArrays();
-        GL30.glBindVertexArray(vaoId);
+    public static void renderVertexArray(FigureVertexArrayObject arrayObject){
+        int vaoId = glGenVertexArrays();
+        glBindVertexArray(vaoId);
 
-        int vboId = GL30.glGenBuffers();
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vboId);
-        FloatBuffer buffer = storeDataInFloatBuffer(data);
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
-        GL30.glBindVertexArray(vaoId);
+        int vboId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        FloatBuffer buffer = storeDataInDoubleBuffer(arrayObject.getVertexArrayObject());
+        glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+        glVertexAttribPointer(0,3, GL_FLOAT, false, 0, 0);
+        MemoryUtil.memFree(buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBindVertexArray(vaoId);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, arrayObject.count());
+        glDisableVertexAttribArray(0);
+        glBindVertexArray(vaoId);
     }
 
-    private static FloatBuffer storeDataInFloatBuffer(float[] data){
+    private static FloatBuffer storeDataInDoubleBuffer(float[] data){
         FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length);
         buffer.put(data);
         buffer.flip();
