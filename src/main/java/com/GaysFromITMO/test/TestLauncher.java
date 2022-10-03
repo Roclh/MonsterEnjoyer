@@ -37,7 +37,12 @@ public class TestLauncher implements InterfaceLogic {
                 -0.5f, 0.5f, 0f
         };
 
-        model = loader.loadModel(vertices);
+        int[] indices = {
+                0,1,3,
+                3,1,2
+        };
+
+        model = loader.loadModel(vertices, indices);
     }
 
     @Override
@@ -73,7 +78,7 @@ public class TestLauncher implements InterfaceLogic {
 
     @Override
     public void cleanup() {
-        renderer.clear();
+        renderer.cleanup();
         loader.cleanup();
     }
 }
