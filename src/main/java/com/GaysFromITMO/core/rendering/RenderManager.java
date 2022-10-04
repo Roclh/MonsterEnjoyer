@@ -4,6 +4,7 @@ import com.GaysFromITMO.Main;
 import com.GaysFromITMO.core.rendering.entity.Entity;
 import com.GaysFromITMO.core.rendering.entity.Model;
 import com.GaysFromITMO.core.rendering.light.DirectionalLight;
+import com.GaysFromITMO.core.rendering.light.PointLight;
 import com.GaysFromITMO.core.utils.MemoryUtils;
 import com.GaysFromITMO.core.utils.TransformationUtils;
 import com.GaysFromITMO.core.window.WindowManager;
@@ -13,6 +14,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +22,7 @@ import java.util.Map;
 
 public class RenderManager {
 
-    public static final Vector3f AMBIENT_LIGHT = new Vector3f(0.6f,0.6f,0.6f);
+    public static final Vector3f AMBIENT_LIGHT = new Vector3f(1.3f,1.3f,1.3f);
     public static final float SPECULAR_POWER = 1.0f;
     private Map<Model, List<Entity>> entities = new HashMap<>();
     private final WindowManager window;
@@ -43,6 +45,7 @@ public class RenderManager {
         shader.createMaterialUniform("material");
         shader.createUniform("specularPower");
         shader.createDirectionalLightUniform("directionalLight");
+        shader.createPointLightUniform("pointLight");
     }
 
     public void bind(Model model){
@@ -68,13 +71,14 @@ public class RenderManager {
         shader.setUniform("viewMatrix", TransformationUtils.getViewMatrix(camera));
     }
 
-    public void renderLights(Camera camera, DirectionalLight directionalLight){
+    public void renderLights(Camera camera, DirectionalLight directionalLight, PointLight pointLight){
         shader.setUniform("ambientLight",AMBIENT_LIGHT);
         shader.setUniform("specularPower", SPECULAR_POWER);
         shader.setUniform("directionalLight", directionalLight);
+        shader.setUniform("pointLight", pointLight);
     }
 
-    public void render(Camera camera, DirectionalLight directionalLight){
+    public void render(Camera camera, DirectionalLight directionalLight, PointLight pointLight){
         clear();
         if (window.isResize()) {
             GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
@@ -83,7 +87,7 @@ public class RenderManager {
 
         shader.bind();
         shader.setUniform("projectionMatrix", window.getProjectionMatrix());
-        renderLights(camera, directionalLight);
+        renderLights(camera, directionalLight, pointLight);
         entities.keySet().forEach(model -> {
             bind(model);
             List<Entity> entityList = entities.get(model);

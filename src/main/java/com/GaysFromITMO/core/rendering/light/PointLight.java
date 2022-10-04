@@ -4,10 +4,10 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class PointLight {
-    private Vector4f colour, position;
+    private Vector3f colour, position;
     private float intencity, constant, linear, exponent;
 
-    public PointLight(Vector4f colour, Vector4f position, float intencity, float constant, float linear, float exponent) {
+    public PointLight(Vector3f colour, Vector3f position, float intencity, float constant, float linear, float exponent) {
         this.colour = colour;
         this.position = position;
         this.intencity = intencity;
@@ -16,23 +16,23 @@ public class PointLight {
         this.exponent = exponent;
     }
 
-    public PointLight(Vector4f colour, Vector4f position, float intencity) {
+    public PointLight(Vector3f colour, Vector3f position, float intencity) {
         this(colour, position, intencity, 1, 0, 0);
     }
 
-    public Vector4f getColour() {
+    public Vector3f getColour() {
         return colour;
     }
 
-    public void setColour(Vector4f colour) {
+    public void setColour(Vector3f colour) {
         this.colour = colour;
     }
 
-    public Vector4f getPosition() {
+    public Vector3f getPosition() {
         return position;
     }
 
-    public void setPosition(Vector4f position) {
+    public void setPosition(Vector3f position) {
         this.position = position;
     }
 

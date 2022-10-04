@@ -4,7 +4,7 @@ import org.joml.Vector4d;
 import org.joml.Vector4f;
 
 public class Material {
-    private static final Vector4f DEFAULT_COLOUR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    private static final Vector4f DEFAULT_COLOUR = new Vector4f(0.6f, 0.6f, 0.6f, 1.0f);
     private Vector4f ambientColour, diffuseColour, specularColour;
     private float reflectance;
     private Texture texture;

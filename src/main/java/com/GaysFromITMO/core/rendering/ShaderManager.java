@@ -2,6 +2,7 @@ package com.GaysFromITMO.core.rendering;
 
 import com.GaysFromITMO.core.rendering.entity.Material;
 import com.GaysFromITMO.core.rendering.light.DirectionalLight;
+import com.GaysFromITMO.core.rendering.light.PointLight;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -55,6 +56,15 @@ public class ShaderManager {
 
     }
 
+    public void createPointLightUniform(String uniformName) throws Exception{
+        createUniform(uniformName + ".colour");
+        createUniform(uniformName + ".position");
+        createUniform(uniformName + ".intensity");
+        createUniform(uniformName + ".constant");
+        createUniform(uniformName + ".linear");
+        createUniform(uniformName + ".exponent");
+    }
+
     public void setUniform(String uniform, Vector4f value) {
         GL20.glUniform4f(uniforms.get(uniform), value.x, value.y, value.z, value.w);
     }
@@ -66,7 +76,14 @@ public class ShaderManager {
         setUniform(uniformName + ".colour", light.getColour());
         setUniform(uniformName + ".direction", light.getDirection());
         setUniform(uniformName + ".intensity", light.getIntensity());
-
+    }
+    public void setUniform(String uniformName, PointLight pointLight){
+        setUniform(uniformName + ".colour", pointLight.getColour());
+        setUniform(uniformName + ".position", pointLight.getPosition());
+        setUniform(uniformName + ".intensity", pointLight.getIntencity());
+        setUniform(uniformName + ".constant", pointLight.getConstant());
+        setUniform(uniformName + ".linear", pointLight.getLinear());
+        setUniform(uniformName + ".exponent", pointLight.getExponent());
     }
 
     public void setUniform(String uniform, boolean value){

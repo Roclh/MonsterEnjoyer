@@ -9,6 +9,7 @@ import com.GaysFromITMO.core.rendering.entity.Entity;
 import com.GaysFromITMO.core.rendering.entity.Model;
 import com.GaysFromITMO.core.rendering.entity.Texture;
 import com.GaysFromITMO.core.rendering.light.DirectionalLight;
+import com.GaysFromITMO.core.rendering.light.PointLight;
 import com.GaysFromITMO.core.window.WindowManager;
 import com.GaysFromITMO.core.window.input.MouseInput;
 import org.joml.Vector2f;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 public class TestLauncher implements InterfaceLogic {
-    private static float CAMERA_MOVE_SPEED = 0.5f;
+    private static float CAMERA_MOVE_SPEED = 0.05f;
     private static final float MOUSE_SENSITIVITY = 0.2f;
     private final RenderManager renderer;
     private final ObjectLoader loader;
@@ -29,6 +30,7 @@ public class TestLauncher implements InterfaceLogic {
     private Camera camera;
     private float lightAngle;
     private DirectionalLight directionalLight;
+    private PointLight pointLight;
 
     Vector3f cameraInc;
 
@@ -47,7 +49,7 @@ public class TestLauncher implements InterfaceLogic {
         renderer.init();
 
         Model model = loader.loadOBJModel("/models/human.obj");
-        model.setTexture(new Texture(loader.loadTexture("textures/hotelka.png")), 1f);
+        model.setTexture(new Texture(loader.loadTexture("textures/blue.png")), 1f);
         entities = new ArrayList<>();
         Random random = new Random();
         for(int i =0; i<50; i++){
@@ -56,10 +58,15 @@ public class TestLauncher implements InterfaceLogic {
             float z = random.nextFloat()*-300;
             entities.add(new Entity(model, new Vector3f(x, y, z), new Vector3f(random.nextFloat()*180, random.nextFloat()*180, random.nextFloat()*180), 1f));
         }
+        entities.add(new Entity(model, new Vector3f(0, 0, -10), new Vector3f(0, 0, 0), 1f));
 
         float lightIntensity = 0.5f;
-        Vector3f lightPosition = new Vector3f(-1, -10, 0);
-        Vector3f lightColour = new Vector3f(0.5f, 0.5f, 0.5f);
+        Vector3f lightPosition = new Vector3f(0,0,-3.2f);
+        Vector3f lightColour = new Vector3f(1, 1, 1);
+        pointLight = new PointLight(lightColour, lightPosition, lightIntensity, 0, 0, 1);
+
+        lightPosition = new Vector3f(-100, -100, 0);
+        lightColour = new Vector3f(0.5f, 0.5f, 0.5f);
         directionalLight = new DirectionalLight(lightColour, lightPosition, lightIntensity);
     }
 
@@ -85,6 +92,11 @@ public class TestLauncher implements InterfaceLogic {
             CAMERA_MOVE_SPEED += 0.1;
         if (window.isKeyPressed(GLFW.GLFW_KEY_KP_SUBTRACT))
             CAMERA_MOVE_SPEED -= 0.1;
+        if (window.isKeyPressed(GLFW.GLFW_KEY_F)){
+            Vector3f lightPosition = new Vector3f(camera.getPosition().x,camera.getPosition().y,camera.getPosition().z);
+            Vector3f lightColour = new Vector3f(1, 1, 1);
+            pointLight = new PointLight(lightColour, lightPosition, 1f, 0, 0, 1);
+        }
 
     }
 
@@ -103,12 +115,12 @@ public class TestLauncher implements InterfaceLogic {
                 lightAngle = -90;
             }
         } else if(lightAngle <= -80 || lightAngle >= 80){
-            float factor = 1 - (Math.abs(lightAngle) - 80) /10.0f;
+            float factor = 1 - (Math.abs(lightAngle) - 80) / 10.0f;
             directionalLight.setIntensity(factor);
             directionalLight.getColour().y = Math.max(factor, 0.9f);
             directionalLight.getColour().z = Math.max(factor, 0.5f);
         }else {
-            directionalLight.setIntensity(1f);
+            directionalLight.setIntensity(1);
             directionalLight.getColour().x = 1;
             directionalLight.getColour().y = 1;
             directionalLight.getColour().z = 1;
@@ -124,7 +136,7 @@ public class TestLauncher implements InterfaceLogic {
     public void render() {
 
 
-        renderer.render(camera, directionalLight);
+        renderer.render(camera, directionalLight, pointLight);
     }
 
     @Override
