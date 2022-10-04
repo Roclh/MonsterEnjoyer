@@ -6,8 +6,6 @@ import com.GaysFromITMO.core.rendering.RenderManager;
 import com.GaysFromITMO.core.window.WindowManager;
 import com.GaysFromITMO.test.TestLauncher;
 
-import java.lang.management.GarbageCollectorMXBean;
-
 public class Main {
     protected static WindowManager window;
     protected static RenderManager renderer;

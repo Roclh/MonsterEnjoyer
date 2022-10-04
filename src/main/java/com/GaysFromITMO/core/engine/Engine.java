@@ -3,6 +3,7 @@ package com.GaysFromITMO.core.engine;
 import com.GaysFromITMO.Main;
 import com.GaysFromITMO.core.InterfaceLogic;
 import com.GaysFromITMO.core.window.WindowManager;
+import com.GaysFromITMO.core.window.input.MouseInput;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
@@ -16,6 +17,7 @@ public class Engine {
     private boolean isRunning;
 
     private WindowManager window;
+    private MouseInput mouseInput;
     private GLFWErrorCallback errorCallback;
     private InterfaceLogic gameLogic;
 
@@ -23,8 +25,10 @@ public class Engine {
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         window = Main.getWindow();
         gameLogic = Main.getGame();
+        mouseInput = new MouseInput();
         window.init();
         gameLogic.init();
+        mouseInput.init();
     }
 
     public void start() throws Exception{
@@ -69,7 +73,7 @@ public class Engine {
             }
 
             if(render){
-                update();
+                update(frametime);
                 render();
                 frames++;
             }
@@ -83,6 +87,8 @@ public class Engine {
     }
 
     private void input(){
+
+        mouseInput.input();
         gameLogic.input();
     }
 
@@ -91,9 +97,8 @@ public class Engine {
         window.update();
     }
 
-    private void update(){
-        gameLogic.update();
-
+    private void update(float interval){
+        gameLogic.update(interval, mouseInput);
     }
 
     private void cleanup(){
