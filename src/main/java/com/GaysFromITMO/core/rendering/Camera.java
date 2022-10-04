@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 
 public class Camera {
     private Vector3f position, rotation;
+    private float vmin, vmax;
 
     public Camera(){
         position = new Vector3f(0, 0, 0);
@@ -27,6 +28,11 @@ public class Camera {
         position.y += y;
     }
 
+    public void setVerticalRotationLimits(float vmin, float vmax){
+        this.vmin = vmin;
+        this.vmax = vmax;
+    }
+
     public void setPosition(float x, float y, float z){
         this.position.x = x;
         this.position.y = y;
@@ -40,7 +46,11 @@ public class Camera {
     }
 
     public void moveRotation(float x, float y, float z){
-        this.rotation.x += x;
+        if(this.rotation.x+x>=vmin&&this.rotation.x+x<=vmax){
+            this.rotation.x += x;
+        }else{
+            this.rotation.x = x>=0?vmax:vmin;
+        }
         this.rotation.y += y;
         this.rotation.z += z;
     }

@@ -88,7 +88,7 @@ public class ObjectLoader {
 
         int[] indiciesArr = indecies.stream().mapToInt((Integer v)-> v).toArray();
 
-        return loadModel(verticesArr, texCoordArr, indiciesArr);
+        return loadModel(verticesArr, texCoordArr, normalArr, indiciesArr);
     }
 
     private static void processVertex(int pos, int texCoord, int normal, List<Vector2f> texCoordList,
@@ -124,11 +124,12 @@ public class ObjectLoader {
         Vector3i facesVec = new Vector3i(pos, coords, normal);
         faces.add(facesVec);
     }
-    public Model loadModel(float[] vertices, float[] textureCoords, int[] indices){
+    public Model loadModel(float[] vertices, float[] textureCoords, float[] normals, int[] indices){
         int id = createVAO();
-        storeIndiciesBuffer(indices);
+        storeIndicesBuffer(indices);
         storeDataInAttributeList(0, 3, vertices);
         storeDataInAttributeList(1, 2, textureCoords);
+        storeDataInAttributeList(2, 3, normals);
         unbind();
         return new Model(id, indices.length);
     }
@@ -176,7 +177,7 @@ public class ObjectLoader {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
-    private void storeIndiciesBuffer(int[] indices){
+    private void storeIndicesBuffer(int[] indices){
         int vbo = GL15.glGenBuffers();
         vbos.add(vbo);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);

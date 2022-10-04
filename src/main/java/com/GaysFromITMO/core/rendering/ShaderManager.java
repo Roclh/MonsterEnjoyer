@@ -1,5 +1,7 @@
 package com.GaysFromITMO.core.rendering;
 
+import com.GaysFromITMO.core.rendering.entity.Material;
+import com.GaysFromITMO.core.rendering.light.DirectionalLight;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -30,11 +32,41 @@ public class ShaderManager {
         uniforms.put(uniformName, uniformLocation);
     }
 
+    public void createMaterialUniform(String uniformName) throws Exception{
+        createUniform(uniformName + ".ambient");
+        createUniform(uniformName + ".diffuse");
+        createUniform(uniformName + ".specular");
+        createUniform(uniformName + ".hasTexture");
+        createUniform(uniformName + ".reflectance");
+    }
+
+    public void setUniform(String uniformName, Material material){
+        setUniform(uniformName + ".ambient", material.getAmbientColour());
+        setUniform(uniformName + ".diffuse", material.getDiffuseColour());
+        setUniform(uniformName + ".specular", material.getSpecularColour());
+        setUniform(uniformName + ".hasTexture", material.hasTexture());
+        setUniform(uniformName + ".reflectance", material.getReflectance());
+    }
+
+    public void createDirectionalLightUniform(String uniformName) throws Exception{
+        createUniform(uniformName + ".colour");
+        createUniform(uniformName + ".direction");
+        createUniform(uniformName + ".intensity");
+
+    }
+
     public void setUniform(String uniform, Vector4f value) {
         GL20.glUniform4f(uniforms.get(uniform), value.x, value.y, value.z, value.w);
     }
     public void setUniform(String uniform, Vector3f value) {
         GL20.glUniform3f(uniforms.get(uniform), value.x, value.y, value.z);
+    }
+
+    public void setUniform(String uniformName, DirectionalLight light){
+        setUniform(uniformName + ".colour", light.getColour());
+        setUniform(uniformName + ".direction", light.getDirection());
+        setUniform(uniformName + ".intensity", light.getIntensity());
+
     }
 
     public void setUniform(String uniform, boolean value){
