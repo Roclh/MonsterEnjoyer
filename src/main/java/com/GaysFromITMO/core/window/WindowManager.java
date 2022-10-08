@@ -8,10 +8,14 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class WindowManager {
     public static final float FOV = (float) Math.toRadians(60);
     public static final float Z_NEAR = 0.01f;
     public static final float Z_FAR = 1000f;
+    public static Map<Integer, Boolean> activeButtons;
 
     private String title;
     private int width, height;
@@ -19,15 +23,20 @@ public class WindowManager {
     private boolean resize, vSync;
     private final Matrix4f projectionMatrix;
 
+
+    private boolean initiated = false;
+
     public WindowManager(String title, int width, int height, boolean vSync) {
         this.title = title;
         this.width = width;
         this.height = height;
         this.vSync = vSync;
         projectionMatrix = new Matrix4f();
+        init();
     }
 
     public void init() {
+        activeButtons = new HashMap<>();
         GLFWErrorCallback.createPrint(System.err).set();
         if (!GLFW.glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
@@ -86,6 +95,7 @@ public class WindowManager {
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glCullFace(GL11.GL_BACK);
         updateProjectionMatrix();
+        initiated = true;
     }
 
     public void update() {
@@ -103,6 +113,18 @@ public class WindowManager {
 
     public boolean isKeyPressed(int keycode) {
         return GLFW.glfwGetKey(window, keycode) == GLFW.GLFW_PRESS;
+    }
+
+    public boolean isKeyReleased(int keycode){
+        if(!activeButtons.containsKey(keycode)){
+            activeButtons.put(keycode, false);
+        }
+        if(GLFW.glfwGetKey(window, keycode) == GLFW.GLFW_PRESS && !activeButtons.get(keycode)){
+            activeButtons.put(keycode, true);
+            return true;
+        }else {
+            return false;
+        }
     }
 
     public boolean shouldClose() {
@@ -171,6 +193,18 @@ public class WindowManager {
     public Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height){
         float aspectRatio = (float) width /height;
         return projectionMatrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
+    }
+
+    public void addButton(int key){
+        activeButtons.put(key, false);
+    }
+
+    public void releaseButtons(){
+        activeButtons.entrySet().forEach(e -> e.setValue(false));
+    }
+
+    public boolean isInitiated() {
+        return initiated;
     }
 }
 

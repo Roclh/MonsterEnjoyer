@@ -1,9 +1,11 @@
 package com.GaysFromITMO.core.utils;
 
-import com.GaysFromITMO.core.rendering.Camera;
+import com.GaysFromITMO.core.rendering.camera.Camera;
 import com.GaysFromITMO.core.rendering.entity.Entity;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import java.util.List;
 
 public class TransformationUtils {
     public static Matrix4f createTransformationMatrix(Entity entity){
@@ -26,5 +28,24 @@ public class TransformationUtils {
         matrix.translate(-pos.x, -pos.y, -pos.z);
         return matrix;
     }
+
+    public static Vector3f multiplyMatrix(Vector3f f, Vector3f s){
+        return new Vector3f(
+                f.y*s.z-f.z*s.y,
+                f.z*s.x-f.x*s.z,
+                f.x*s.y + f.y*s.x
+        );
+    }
+
+    public static float[] convertToFloatArray(List<Float> floatList){
+        float[] floats = new float[floatList.size()];
+        int i =0;
+        for (Float f: floatList) {
+            floats[i] = f;
+            i++;
+        }
+        return floats;
+    }
+
 
 }

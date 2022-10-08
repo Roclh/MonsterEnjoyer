@@ -2,6 +2,8 @@ package com.GaysFromITMO.core.rendering;
 
 import com.GaysFromITMO.core.rendering.entity.Model;
 import com.GaysFromITMO.core.utils.MemoryUtils;
+import com.GaysFromITMO.logger.Log;
+import com.GaysFromITMO.logger.Loggable;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -18,10 +20,11 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ObjectLoader {
+public class ObjectLoader implements Loggable<ObjectLoader>{
     private List<Integer> vaos = new ArrayList<>();
     private List<Integer> vbos = new ArrayList<>();
     private List<Integer> textures = new ArrayList<>();
+    private boolean isLogged = false;
 
     public Model loadOBJModel(String filename){
         List<String> lines = MemoryUtils.readAllLines(filename);
@@ -32,8 +35,8 @@ public class ObjectLoader {
 
         for (String line : lines){
             String[] tokens = line.split("\\s+");
-            switch (tokens[0]){
-                case "v":
+            switch (tokens[0]) {
+                case "v" -> {
                     //vertices
                     Vector3f verticesVec = new Vector3f(
                             Float.parseFloat(tokens[1]),
@@ -41,32 +44,32 @@ public class ObjectLoader {
                             Float.parseFloat(tokens[3])
                     );
                     vertices.add(verticesVec);
-                    break;
-                case "vt":
+                }
+                case "vt" -> {
                     //vertex textures
                     Vector2f textureVec = new Vector2f(
                             Float.parseFloat(tokens[1]),
                             Float.parseFloat(tokens[2])
                     );
                     textures.add(textureVec);
-                    break;
-                case "vn":
+                }
+                case "vn" -> {
                     Vector3f normalsVec = new Vector3f(
                             Float.parseFloat(tokens[1]),
                             Float.parseFloat(tokens[2]),
                             Float.parseFloat(tokens[3])
                     );
                     normals.add(normalsVec);
-                    //vertex normals
-                    break;
-                case "f":
+                }
+                //vertex normals
+                case "f" -> {
                     //faces
                     processFace(tokens[1], faces);
                     processFace(tokens[2], faces);
                     processFace(tokens[3], faces);
-                    break;
-                default:
-                    break;
+                }
+                default -> {
+                }
             }
         }
         List<Integer> indecies = new ArrayList<>();
@@ -86,10 +89,13 @@ public class ObjectLoader {
             processVertex(face.x, face.y, face.z, textures, normals, indecies, texCoordArr, normalArr);
         }
 
-        int[] indiciesArr = indecies.stream().mapToInt((Integer v)-> v).toArray();
+        int[] indicesArr = indecies.stream().mapToInt((Integer v)-> v).toArray();
 
-        return loadModel(verticesArr, texCoordArr, normalArr, indiciesArr);
+        Log.info(getClass().getName() + " loaded OBJ model with path " + filename, isLogged);
+        return loadModel(verticesArr, texCoordArr, normalArr, indicesArr);
     }
+
+
 
     private static void processVertex(int pos, int texCoord, int normal, List<Vector2f> texCoordList,
                                       List<Vector3f> normalList, List<Integer> indicesList,
@@ -157,10 +163,11 @@ public class ObjectLoader {
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
         STBImage.stbi_image_free(buffer);
+        Log.info(getClass().getName() + " loaded texture with path " + filepath, isLogged);
         return id;
     }
 
-    private int createVAO(){
+    public int createVAO(){
         int id = GL30.glGenVertexArrays();
         vaos.add(id);
         GL30.glBindVertexArray(id);
@@ -194,5 +201,15 @@ public class ObjectLoader {
         vaos.forEach(GL30::glDeleteVertexArrays);
         vbos.forEach(GL30::glDeleteBuffers);
         textures.forEach(GL11::glDeleteTextures);
+    }
+
+    @Override
+    public boolean isLogged() {
+        return isLogged;
+    }
+    @Override
+    public ObjectLoader isLogged(boolean isLogged){
+        this.isLogged = isLogged;
+        return this;
     }
 }

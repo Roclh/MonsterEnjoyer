@@ -1,6 +1,5 @@
 package com.GaysFromITMO.core.rendering.entity;
 
-import org.joml.Vector4d;
 import org.joml.Vector4f;
 
 public class Material {
@@ -36,6 +35,14 @@ public class Material {
         this.specularColour = specularColour;
         this.reflectance = reflectance;
         this.texture = texture;
+    }
+
+    public Material(Material material){
+        this.ambientColour = material.getAmbientColour();
+        this.diffuseColour = material.getDiffuseColour();
+        this.specularColour = material.getSpecularColour();
+        this.reflectance = material.getReflectance();
+        this.texture = material.getTexture();
     }
 
     public Vector4f getAmbientColour() {

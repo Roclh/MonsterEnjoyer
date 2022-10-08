@@ -1,5 +1,7 @@
 package com.GaysFromITMO.core.rendering.entity;
 
+import java.util.Objects;
+
 public class Model {
     private int id;
     private int vertexCount;
@@ -11,10 +13,22 @@ public class Model {
         this.material = new Material();
     }
 
+    public Model(){
+        this.id = -1;
+        this.vertexCount = -1;
+        this.material = new Material();
+    }
+
     public Model(int id, int vertexCount, Texture texture) {
         this.id = id;
         this.vertexCount = vertexCount;
         this.material = new Material(texture);
+    }
+
+    public Model(Model model) {
+        this.id = model.getId();
+        this.vertexCount = model.getVertexCount();
+        this.material = new Material(model.getMaterial());
     }
 
     public Material getMaterial() {
@@ -47,5 +61,13 @@ public class Model {
 
     public int getVertexCount() {
         return vertexCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Model model = (Model) o;
+        return id == model.id;
     }
 }

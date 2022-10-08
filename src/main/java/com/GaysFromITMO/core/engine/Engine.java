@@ -1,13 +1,14 @@
 package com.GaysFromITMO.core.engine;
 
-import com.GaysFromITMO.Main;
 import com.GaysFromITMO.core.InterfaceLogic;
+import com.GaysFromITMO.binder.SingletonClassProvider;
 import com.GaysFromITMO.core.window.WindowManager;
 import com.GaysFromITMO.core.window.input.MouseInput;
+import com.GaysFromITMO.test.TestLauncher;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
-public class Engine {
+public class Engine{
     public static final long NANOSECOND = 1000000000L;
     public static final float FRAMERATE = 1000;
 
@@ -16,19 +17,13 @@ public class Engine {
 
     private boolean isRunning;
 
-    private WindowManager window;
-    private MouseInput mouseInput;
+    private WindowManager window = (WindowManager) SingletonClassProvider.getStoredClass(WindowManager.class);
+    private MouseInput mouseInput = (MouseInput) SingletonClassProvider.getStoredClass(MouseInput.class);
     private GLFWErrorCallback errorCallback;
-    private InterfaceLogic gameLogic;
+    private final InterfaceLogic gameLogic = (TestLauncher)SingletonClassProvider.getStoredClass(TestLauncher.class);
 
     private void init() throws Exception{
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        window = Main.getWindow();
-        gameLogic = Main.getGame();
-        mouseInput = new MouseInput();
-        window.init();
-        gameLogic.init();
-        mouseInput.init();
     }
 
     public void start() throws Exception{
@@ -67,6 +62,7 @@ public class Engine {
                 if(frameCounter >= NANOSECOND){
                     setFps(frames);
                     window.setTitle("Monster Enjoyer "+ getFps());
+                    window.releaseButtons();
                     frames = 0;
                     frameCounter = 0;
                 }

@@ -1,4 +1,4 @@
-package com.GaysFromITMO.core.rendering;
+package com.GaysFromITMO.core.rendering.camera;
 
 import org.joml.Vector3f;
 
@@ -43,6 +43,9 @@ public class Camera {
         this.rotation.x = x;
         this.rotation.y = y;
         this.rotation.z = z;
+        this.rotation.x %= 360;
+        this.rotation.y %= 360;
+        this.rotation.z %= 360;
     }
 
     public void moveRotation(float x, float y, float z){
@@ -53,6 +56,25 @@ public class Camera {
         }
         this.rotation.y += y;
         this.rotation.z += z;
+        this.rotation.x %= 360;
+        this.rotation.y %= 360;
+        this.rotation.z %= 360;
+    }
+
+    public Vector3f rotationToNormalVector(){
+        return new Vector3f(
+                (float) (Math.cos(Math.toRadians(this.rotation.y))*Math.cos(Math.toRadians(this.rotation.x))),
+                (float) (Math.sin(Math.toRadians(this.rotation.y))*Math.cos(Math.toRadians(this.rotation.x))),
+                (float) Math.sin(Math.toRadians(this.rotation.x))
+        );
+    }
+
+    public Vector3f rotationToNormalVector(float range){
+        return new Vector3f(
+                (float) (Math.cos(Math.toRadians(this.rotation.y))*Math.cos(Math.toRadians(this.rotation.x)))*range,
+                (float) Math.sin(Math.toRadians(this.rotation.x))*range,
+                (float) (Math.sin(Math.toRadians(this.rotation.y))*Math.cos(Math.toRadians(this.rotation.x)))*range
+        );
     }
 
     public Vector3f getPosition() {

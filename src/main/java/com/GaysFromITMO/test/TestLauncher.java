@@ -1,15 +1,16 @@
 package com.GaysFromITMO.test;
 
-import com.GaysFromITMO.Main;
 import com.GaysFromITMO.core.InterfaceLogic;
-import com.GaysFromITMO.core.rendering.Camera;
+import com.GaysFromITMO.core.rendering.camera.Camera;
 import com.GaysFromITMO.core.rendering.ObjectLoader;
-import com.GaysFromITMO.core.rendering.RenderManager;
+import com.GaysFromITMO.core.rendering.renderers.DefaultRenderManager;
 import com.GaysFromITMO.core.rendering.entity.Entity;
 import com.GaysFromITMO.core.rendering.entity.Model;
 import com.GaysFromITMO.core.rendering.entity.Texture;
 import com.GaysFromITMO.core.rendering.light.DirectionalLight;
 import com.GaysFromITMO.core.rendering.light.PointLight;
+import com.GaysFromITMO.core.rendering.light.SpotLight;
+import com.GaysFromITMO.binder.SingletonClassProvider;
 import com.GaysFromITMO.core.window.WindowManager;
 import com.GaysFromITMO.core.window.input.MouseInput;
 import org.joml.Vector2f;
@@ -23,25 +24,25 @@ import java.util.Random;
 public class TestLauncher implements InterfaceLogic {
     private static float CAMERA_MOVE_SPEED = 0.05f;
     private static final float MOUSE_SENSITIVITY = 0.2f;
-    private final RenderManager renderer;
-    private final ObjectLoader loader;
-    private final WindowManager window;
+    private final DefaultRenderManager renderer = (DefaultRenderManager)SingletonClassProvider.getStoredClass(DefaultRenderManager.class);
+    private final ObjectLoader loader = (ObjectLoader)SingletonClassProvider.getStoredClass(ObjectLoader.class);
+    private final WindowManager window = (WindowManager) SingletonClassProvider.getStoredClass(WindowManager.class);
     private List<Entity> entities;
     private Camera camera;
     private float lightAngle;
     private DirectionalLight directionalLight;
     private PointLight pointLight;
+    private SpotLight spotLight;
+    private boolean isLinked = false;
 
     Vector3f cameraInc;
 
-    public TestLauncher() {
-        renderer = new RenderManager();
-        loader = new ObjectLoader();
-        window = Main.getWindow();
+    public TestLauncher() throws Exception {
         camera = new Camera();
         camera.setVerticalRotationLimits(-40f, 40f);
         cameraInc = new Vector3f(0, 0, 0);
         lightAngle = -90;
+        init();
     }
 
     @Override
@@ -52,9 +53,9 @@ public class TestLauncher implements InterfaceLogic {
         model.setTexture(new Texture(loader.loadTexture("textures/blue.png")), 1f);
         entities = new ArrayList<>();
         Random random = new Random();
-        for(int i =0; i<50; i++){
-            float x = random.nextFloat()*100 - 50;
-            float y = random.nextFloat()*100 - 50;
+        for(int i =0; i<1000; i++){
+            float x = random.nextFloat()*10000 - 5000;
+            float y = random.nextFloat()*10000 - 5000;
             float z = random.nextFloat()*-300;
             entities.add(new Entity(model, new Vector3f(x, y, z), new Vector3f(random.nextFloat()*180, random.nextFloat()*180, random.nextFloat()*180), 1f));
         }
@@ -64,6 +65,11 @@ public class TestLauncher implements InterfaceLogic {
         Vector3f lightPosition = new Vector3f(0,0,-3.2f);
         Vector3f lightColour = new Vector3f(1, 1, 1);
         pointLight = new PointLight(lightColour, lightPosition, lightIntensity, 0, 0, 1);
+
+        Vector3f conedir = new Vector3f(0, 0, 1);
+        float cutoff = (float) Math.cos(Math.toRadians(60));
+        spotLight = new SpotLight(new PointLight(lightColour, new Vector3f(0, 0, 1),1f, 0, 0, 1),
+                conedir, cutoff);
 
         lightPosition = new Vector3f(-100, -100, 0);
         lightColour = new Vector3f(0.5f, 0.5f, 0.5f);
@@ -92,10 +98,9 @@ public class TestLauncher implements InterfaceLogic {
             CAMERA_MOVE_SPEED += 0.1;
         if (window.isKeyPressed(GLFW.GLFW_KEY_KP_SUBTRACT))
             CAMERA_MOVE_SPEED -= 0.1;
-        if (window.isKeyPressed(GLFW.GLFW_KEY_F)){
-            Vector3f lightPosition = new Vector3f(camera.getPosition().x,camera.getPosition().y,camera.getPosition().z);
-            Vector3f lightColour = new Vector3f(1, 1, 1);
-            pointLight = new PointLight(lightColour, lightPosition, 1f, 0, 0, 1);
+        if (window.isKeyReleased(GLFW.GLFW_KEY_F)){
+            System.out.println("Light switched");
+            isLinked = !isLinked;
         }
 
     }
@@ -128,15 +133,19 @@ public class TestLauncher implements InterfaceLogic {
         double angRad = Math.toRadians(lightAngle);
         directionalLight.getDirection().x = (float) Math.sin(angRad);
         directionalLight.getDirection().y = (float) Math.cos(angRad);
+        if(isLinked){
+            System.out.println(camera.getRotation().toString());
+            spotLight.setConeDirection(camera.getRotation());
+            spotLight.getPointLight().setPosition(camera.getPosition());
+        }
 
         entities.forEach(renderer::processEntity);
     }
 
     @Override
     public void render() {
-
-
-        renderer.render(camera, directionalLight, pointLight);
+        renderer.passParams(camera, directionalLight, pointLight, spotLight);
+        renderer.render();
     }
 
     @Override

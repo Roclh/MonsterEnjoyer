@@ -1,6 +1,7 @@
 package com.GaysFromITMO.core.window.input;
 
-import com.GaysFromITMO.Main;
+import com.GaysFromITMO.binder.SingletonClassProvider;
+import com.GaysFromITMO.core.window.WindowManager;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -8,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
 public class MouseInput {
     private final Vector2d previousPos, currentPos;
     private final Vector2f displVec;
+    private final WindowManager window = (WindowManager) SingletonClassProvider.getStoredClass(WindowManager.class);
 
     private boolean inWindow = false, leftButtonPress = false, rightButtonPress = false;
 
@@ -15,19 +17,20 @@ public class MouseInput {
         this.previousPos = new Vector2d(-1, -1);
         this.currentPos = new Vector2d(0, 0);
         this.displVec = new Vector2f();
+        init();
     }
 
     public void init(){
-        GLFW.glfwSetCursorPosCallback(Main.getWindow().getWindow(), (window, xpos, ypos)->{
+        GLFW.glfwSetCursorPosCallback(window.getWindow(), (window, xpos, ypos)->{
             currentPos.x = xpos;
             currentPos.y = ypos;
         });
 
-        GLFW.glfwSetCursorEnterCallback(Main.getWindow().getWindow(), (window, entered)->{
+        GLFW.glfwSetCursorEnterCallback(window.getWindow(), (window, entered)->{
             inWindow = entered;
         });
 
-        GLFW.glfwSetMouseButtonCallback(Main.getWindow().getWindow(), (window, button, action, mods)->{
+        GLFW.glfwSetMouseButtonCallback(window.getWindow(), (window, button, action, mods)->{
             leftButtonPress = button== GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS;
             rightButtonPress = button == GLFW.GLFW_MOUSE_BUTTON_2 && action == GLFW.GLFW_PRESS;
         });
